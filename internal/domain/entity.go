@@ -9,20 +9,19 @@ type User struct {
 	id        uint
 	username  string
 	phone     string
-	email     string
+	email     *string
 	password  string
 	createdAT time.Time
-	isActive  bool
-	badge     string
-
-	score float64
+	isActive  *bool
+	badge     *string
+	score     *float64
 }
 
-func NewUser(email, password, badge, username, phone string, isactive bool, score int64) (*User, error) {
-	if len(email) != 0 {
+func NewUser(email *string, password string, badge *string, username, phone string, isactive *bool, score *float64) (*User, error) {
+	if len(*email) != 0 {
 		regex := regexp.MustCompile(`^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$`)
 
-		if !regex.MatchString(email) {
+		if !regex.MatchString(*email) {
 			return nil, ErrInvalidEmail
 		}
 	}
@@ -41,9 +40,6 @@ func NewUser(email, password, badge, username, phone string, isactive bool, scor
 		return nil, ErrInvalidPassword
 	}
 
-	if score == 0 {
-		score = 0
-	}
 	nows := time.Now()
 
 	return &User{
@@ -53,26 +49,29 @@ func NewUser(email, password, badge, username, phone string, isactive bool, scor
 		password:  password,
 		badge:     badge,
 		isActive:  isactive,
-		score:     float64(score),
+		score:     score,
 		createdAT: nows,
 	}, nil
 }
 
 func WithoutValidation(email, password, badge, username, phone string, isactive bool, score float64, times time.Time) (*User, error) {
 	return &User{
-		email:     email,
+		email:     &email,
 		username:  username,
 		phone:     phone,
 		password:  password,
-		badge:     badge,
-		isActive:  isactive,
-		score:     score,
+		badge:     &badge,
+		isActive:  &isactive,
+		score:     &score,
 		createdAT: times,
 	}, nil
 }
 
 func (u User) Email() string {
-	return u.email
+	if u.email == nil {
+		return ""
+	}
+	return *u.email
 }
 
 func (u User) Password() string {
@@ -80,15 +79,24 @@ func (u User) Password() string {
 }
 
 func (u User) Badge() string {
-	return u.badge
+	if u.badge == nil {
+		return ""
+	}
+	return *u.badge
 }
 
 func (u User) IsActive() bool {
-	return u.isActive
+	if u.isActive == nil {
+		return false
+	}
+	return *u.isActive
 }
 
 func (u User) Score() float64 {
-	return u.score
+	if u.score == nil {
+		return 0
+	}
+	return *u.score
 }
 
 func (u User) CreatedAt() time.Time {
