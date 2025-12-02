@@ -1,30 +1,44 @@
 package domain
 
 import (
-	"errors"
 	"regexp"
 	"time"
 )
 
 type User struct {
 	id        uint
+	username  string
+	phone     string
 	email     string
 	password  string
 	createdAT time.Time
 	isActive  bool
 	badge     string
-	score     float64
+
+	score float64
 }
 
-func NewUser(email, password, badge string, isactive bool, score int64) (*User, error) {
-	regex := regexp.MustCompile(`^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$`)
+func NewUser(email, password, badge, username, phone string, isactive bool, score int64) (*User, error) {
+	if len(email) != 0 {
+		regex := regexp.MustCompile(`^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$`)
 
-	if !regex.MatchString(email) {
-		return nil, errors.New("invalid email")
+		if !regex.MatchString(email) {
+			return nil, ErrInvalidEmail
+		}
+	}
+
+	if len(username) == 0 {
+		return nil, ErrInvalidUsername
+	}
+
+	phonregex := regexp.MustCompile(`^(?:\+?251|0)?9\d{8}$`)
+
+	if !phonregex.MatchString(phone) {
+		return nil, ErrInvalidPhone
 	}
 
 	if len(password) < 4 {
-		return nil, errors.New("password must be grather than 4")
+		return nil, ErrInvalidPassword
 	}
 
 	if score == 0 {
@@ -34,6 +48,8 @@ func NewUser(email, password, badge string, isactive bool, score int64) (*User, 
 
 	return &User{
 		email:     email,
+		username:  username,
+		phone:     phone,
 		password:  password,
 		badge:     badge,
 		isActive:  isactive,
@@ -42,9 +58,11 @@ func NewUser(email, password, badge string, isactive bool, score int64) (*User, 
 	}, nil
 }
 
-func WithoutValidation(email, password, badge string, isactive bool, score float64, times time.Time) (*User, error) {
+func WithoutValidation(email, password, badge, username, phone string, isactive bool, score float64, times time.Time) (*User, error) {
 	return &User{
 		email:     email,
+		username:  username,
+		phone:     phone,
 		password:  password,
 		badge:     badge,
 		isActive:  isactive,
@@ -79,6 +97,14 @@ func (u User) CreatedAt() time.Time {
 
 func (u User) ID() uint {
 	return u.id
+}
+
+func (u User) Username() string {
+	return u.username
+}
+
+func (u User) Phone() string {
+	return u.phone
 }
 
 func (u *User) Id_Set(id uint) {
