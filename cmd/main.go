@@ -23,6 +23,6 @@ func main() {
 
 	route.UserRoute(handler, routes)
 
-	routes.Run(":8080")
+	routes.Run(":9090")
 
 }

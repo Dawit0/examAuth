@@ -50,3 +50,49 @@ func (ur *UserRepo) FindByPhone(phone string) (*domain.User, error) {
 
 	return domain, nil
 }
+
+func (ur *UserRepo) FindByID(id uint) (*domain.User, error) {
+	var models model.UserModel
+	err := ur.DB.Model(&model.UserModel{}).Where("id = ?", id).First(&models).Error
+	if err != nil {
+		return nil, err
+	}
+
+	domain, err := mapper.MapModelToDomain(models)
+	if err != nil {
+		return nil, err
+	}
+
+	return domain, nil
+}
+
+func (ur *UserRepo) AllUsers() ([]domain.User, error) {
+	var models []model.UserModel
+
+	err := ur.DB.Model(&model.UserModel{}).Find(&models).Error
+	if err != nil {
+		return nil, err
+	}
+
+	domain := make([]domain.User, 0, len(models))
+
+	for _, item := range models {
+		val, err := mapper.MapModelToDomain(item)
+
+		if err != nil {
+			continue
+		}
+
+		domain = append(domain, *val)
+	}
+
+	return domain, nil
+}
+
+func (ur *UserRepo) DeleteUser(id uint) error {
+	err := ur.DB.Model(&model.UserModel{}).Delete(&model.UserModel{}, id).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}

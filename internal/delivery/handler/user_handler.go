@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Dawit0/examAuth/internal/delivery/dto"
 	"github.com/Dawit0/examAuth/internal/delivery/mapper"
@@ -68,4 +69,56 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"token": token})
+}
+
+func (h *UserHandler) FindByID(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	domain, err := h.usecase.FindByID(uint(id))
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	response, err := mapper.MapDomaintoResponse(*domain)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *UserHandler) AllUsers(c *gin.Context) {
+	out, err := h.usecase.AllUsers()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	response := make([]dto.UserResponse, 0, len(out))
+
+	for _, item := range out {
+		val, err := mapper.MapDomaintoResponse(item)
+		if err != nil {
+			continue
+		}
+
+		response = append(response, *val)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": response})
+}
+
+func (h *UserHandler) DeleteUser(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	err := h.usecase.DeleteUser(uint(id))
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "user deleted successfully"})
 }
