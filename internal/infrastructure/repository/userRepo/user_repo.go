@@ -1,4 +1,4 @@
-package repository
+package userRepo
 
 import (
 	"github.com/Dawit0/examAuth/internal/domain"
@@ -12,7 +12,7 @@ type UserRepo struct {
 }
 
 func NewUserRepo(db *gorm.DB) *UserRepo {
-	db.AutoMigrate(&model.UserModel{})
+	db.AutoMigrate(&model.UserModel{}, &model.PasswordResetModel{})
 	return &UserRepo{DB: db}
 }
 
