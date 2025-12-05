@@ -6,7 +6,7 @@ type UserModel struct {
 	ID        uint `gorm:"primarykey"`
 	Username  string
 	Phone     string
-	Email     *string
+	Email     string
 	Password  string
 	CreatedAt time.Time
 	IsActive  *bool

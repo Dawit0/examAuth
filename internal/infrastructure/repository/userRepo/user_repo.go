@@ -36,9 +36,9 @@ func (ur *UserRepo) CreateUser(user *domain.User) (*domain.User, error) {
 
 }
 
-func (ur *UserRepo) FindByPhone(phone string) (*domain.User, error) {
+func (ur *UserRepo) FindByEmail(email string) (*domain.User, error) {
 	var models model.UserModel
-	err := ur.DB.Model(&model.UserModel{}).Where("phone=?", phone).First(&models).Error
+	err := ur.DB.Model(&model.UserModel{}).Where("email=?", email).First(&models).Error
 	if err != nil {
 		return nil, err
 	}

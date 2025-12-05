@@ -16,7 +16,7 @@ func MapDomainToModel(user domain.User) (*model.UserModel, error) {
 		ID:        user.ID(),
 		Username:  user.Username(),
 		Phone:     user.Phone(),
-		Email:     &email,
+		Email:     email,
 		Password:  string(pass),
 		CreatedAt: user.CreatedAt(),
 		IsActive:  &isActive,

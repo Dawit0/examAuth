@@ -56,7 +56,7 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 		return
 	}
 
-	user, err := h.usecase.UserLogin(dtos.Phone, dtos.Password)
+	user, err := h.usecase.UserLogin(dtos.Email, dtos.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

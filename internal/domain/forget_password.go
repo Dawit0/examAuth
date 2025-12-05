@@ -5,16 +5,16 @@ import "time"
 type ForgetPassword struct {
 	id        uint
 	userID    uint
-	phone     string
+	email     string
 	otp       string
 	expiredAt time.Time
 	used      bool
 }
 
-func NewForgetPassword(userID uint, phone string, otp string, expiredAt time.Time, used bool) (*ForgetPassword, error) {
+func NewForgetPassword(userID uint, email string, otp string, expiredAt time.Time, used bool) (*ForgetPassword, error) {
 	return &ForgetPassword{
 		userID:    userID,
-		phone:     phone,
+		email:     email,
 		otp:       otp,
 		expiredAt: expiredAt,
 		used:      used,
@@ -29,8 +29,8 @@ func (f ForgetPassword) UserId() uint {
 	return f.userID
 }
 
-func (f ForgetPassword) Phone() string {
-	return f.phone
+func (f ForgetPassword) Email() string {
+	return f.email
 }
 
 func (f ForgetPassword) Otp() string {
@@ -48,3 +48,4 @@ func (f ForgetPassword) Used() bool {
 func (f *ForgetPassword) Set_Id(id uint) {
 	f.id = id
 }
+

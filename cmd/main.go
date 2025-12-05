@@ -14,15 +14,19 @@ func main() {
 	db := database.DBconnection()
 
 	userRepos := repo.NewUserRepo(db)
+	resetUserRepo := repo.NewResetUserRepo(db)
 
 	usecase := service.NewUserService(userRepos)
+	resetUserUseCase := service.NewResetUserService(resetUserRepo, service.NewTestMailer("123456"))
 
-	handler := handler.NewUserHandler(usecase)
+	userHandler := handler.NewUserHandler(usecase)
+	resetHandler := handler.NewForgetPasswordHandler(resetUserUseCase)
 
 	routes := gin.Default()
 
-	route.UserRoute(handler, routes)
+	route.UserRoute(userHandler, routes)
+	route.ResetRoute(resetHandler, routes)
 
-	routes.Run(":9090")
+	routes.Run(":8080")
 
 }

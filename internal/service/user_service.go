@@ -20,7 +20,7 @@ func (uc *UserService) CreateUser(user *domain.User) (*domain.User, error) {
 	if user == nil {
 		return nil, nil
 	}
-	val, _ := uc.UserRepo.FindByPhone(user.Phone())
+	val, _ := uc.UserRepo.FindByEmail(user.Email())
 	// if err != nil {
 	// 	return nil, err
 	// }
@@ -30,8 +30,8 @@ func (uc *UserService) CreateUser(user *domain.User) (*domain.User, error) {
 	return uc.UserRepo.CreateUser(user)
 }
 
-func (uc *UserService) UserLogin(phone string, password string) (*domain.User, error) {
-	user, err := uc.UserRepo.FindByPhone(phone)
+func (uc *UserService) UserLogin(email string, password string) (*domain.User, error) {
+	user, err := uc.UserRepo.FindByEmail(email)
 	if err != nil {
 		return nil, err
 	}

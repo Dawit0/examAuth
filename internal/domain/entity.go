@@ -9,7 +9,7 @@ type User struct {
 	id        uint
 	username  string
 	phone     string
-	email     *string
+	email     string
 	password  string
 	createdAT time.Time
 	isActive  *bool
@@ -17,11 +17,11 @@ type User struct {
 	score     *float64
 }
 
-func NewUser(email *string, password string, badge *string, username, phone string, isactive *bool, score *float64) (*User, error) {
-	if email != nil && len(*email) != 0 {
+func NewUser(email string, password string, badge *string, username, phone string, isactive *bool, score *float64) (*User, error) {
+	if len(email) != 0 {
 		regex := regexp.MustCompile(`^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$`)
 
-		if !regex.MatchString(*email) {
+		if !regex.MatchString(email) {
 			return nil, ErrInvalidEmail
 		}
 	}
@@ -56,7 +56,7 @@ func NewUser(email *string, password string, badge *string, username, phone stri
 
 func WithoutValidation(email, password, badge, username, phone string, isactive bool, score float64, times time.Time) (*User, error) {
 	return &User{
-		email:     &email,
+		email:     email,
 		username:  username,
 		phone:     phone,
 		password:  password,
@@ -68,10 +68,8 @@ func WithoutValidation(email, password, badge, username, phone string, isactive 
 }
 
 func (u User) Email() string {
-	if u.email == nil {
-		return ""
-	}
-	return *u.email
+
+	return u.email
 }
 
 func (u User) Password() string {
@@ -117,4 +115,8 @@ func (u User) Phone() string {
 
 func (u *User) Id_Set(id uint) {
 	u.id = id
+}
+
+func (u *User) SetPassword(password string) {
+	u.password = password
 }
