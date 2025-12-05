@@ -2,8 +2,9 @@ package service
 
 import (
 	"crypto/rand"
-	"encoding/base64"
 	"errors"
+	"fmt"
+	"math/big"
 	"time"
 
 	"github.com/Dawit0/examAuth/internal/infrastructure/repository/userRepo"
@@ -29,7 +30,10 @@ func (r *ResetUserService) RequestResetPasswordEmail(email string) error {
 		return err
 	}
 
-	otp := generateOTP(6)
+	otp, err := generateNumericOTP(6)
+	if err != nil {
+		return err
+	}
 	expiredAt := time.Now().Add(r.otpTTl)
 	err = r.repo.SavePasswordReset(email, user.ID(), otp, expiredAt)
 	if err != nil {
@@ -63,8 +67,14 @@ func (r *ResetUserService) ResetPassword(email string, otp string, newPassword s
 	return nil
 }
 
-func generateOTP(n int) string {
-	b := make([]byte, n)
-	rand.Read(b)
-	return base64.StdEncoding.EncodeToString(b)[:n]
+func generateNumericOTP(n int) (string, error) {
+	otp := ""
+	for i := 0; i < n; i++ {
+		num, err := rand.Int(rand.Reader, big.NewInt(10)) // random number 0-9
+		if err != nil {
+			return "", fmt.Errorf("failed to generate OTP: %w", err)
+		}
+		otp += num.String()
+	}
+	return otp, nil
 }

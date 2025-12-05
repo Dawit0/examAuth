@@ -1,22 +1,46 @@
 package service
 
-import "fmt"
+import (
+	"fmt"
+	"net/smtp"
+)
 
-type TestMailer struct {
-	FixedOTP string
+type GmailMailer struct {
+	Email       string
+	AppPassword string
 }
 
-func NewTestMailer(otp string) *TestMailer {
-	return &TestMailer{
-		FixedOTP: otp,
+func NewGmailMailer(email, appPassword string) *GmailMailer {
+	return &GmailMailer{
+		Email:       email,
+		AppPassword: appPassword,
 	}
 }
 
-func (m *TestMailer) SendMail(email, otp string) error {
-	fmt.Println("========== TEST MAILER ==========")
-	fmt.Println("To:      ", email)
-	fmt.Println("OTP:     ", otp)
-	fmt.Println("Message: This is a test OTP email (not sent).")
-	fmt.Println("=================================")
+func (m *GmailMailer) SendMail(toEmail, otp string) error {
+	smtpHost := "smtp.gmail.com"
+	smtpPort := "587" // TLS
+
+	auth := smtp.PlainAuth("", m.Email, m.AppPassword, smtpHost)
+
+	subject := "Your OTP Code"
+	body := fmt.Sprintf("Your One-Time Password (OTP) is: %s\nThis code expires in 5 minutes.", otp)
+
+	// SMTP Email Format
+	message := []byte(
+		"From: " + m.Email + "\r\n" +
+			"To: " + toEmail + "\r\n" +
+			"Subject: " + subject + "\r\n" +
+			"\r\n" +
+			body +
+			"\r\n",
+	)
+
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, m.Email, []string{toEmail}, message)
+	if err != nil {
+		return fmt.Errorf("failed to send email: %w", err)
+	}
+
+	fmt.Println("Email sent successfully to:", toEmail)
 	return nil
 }
